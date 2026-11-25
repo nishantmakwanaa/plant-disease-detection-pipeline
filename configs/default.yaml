@@ -1,0 +1,79 @@
+# Training hyperparameters
+training:
+  epochs: 50
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+  mixed_precision: true
+  gradient_clip: 1.0
+
+# Optimizer (AdamW)
+optimizer:
+  name: adamw
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+
+# LR Scheduler (CosineAnnealingLR)
+scheduler:
+  name: cosine
+  T_max: 50          # Same as epochs
+  eta_min: 1.0e-6
+  warmup_epochs: 5
+
+# Model
+model:
+  architecture: efficientnet_b3
+  pretrained: true
+  num_classes: 38
+  dropout: 0.4
+  freeze_backbone_epochs: 5   # Fine-tune only head for first N epochs
+
+# Dataset / splits
+dataset:
+  root: ./data
+  image_size: 300
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  use_class_weights: true
+  seed: 42
+
+# Augmentation
+augmentation:
+  random_hflip: true
+  random_vflip: true
+  random_rotation: 30
+  color_jitter:
+    brightness: 0.3
+    contrast: 0.3
+    saturation: 0.3
+    hue: 0.1
+  random_erasing: 0.1
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+# Early stopping
+early_stopping:
+  patience: 10
+  min_delta: 1.0e-4
+  monitor: val_acc    # 'val_acc' or 'val_loss'
+
+# Checkpointing
+checkpoint:
+  dir: ./checkpoints
+  save_top_k: 3
+  filename: best.pth
+
+# Logging
+logging:
+  log_dir: ./logs
+  save_curves: true
+  print_every: 10    # batches
+
+# Inference
+inference:
+  top_k: 3
+  cam_layer: null    # auto-detect last conv layer
+  cam_alpha: 0.5     # blend weight for heatmap overlay
